@@ -32,7 +32,6 @@ export default function App() {
   };
 
   const totalFeedback = feedback.good + feedback.neutral + feedback.bad;
-
   return (
     <div>
       <Description />
