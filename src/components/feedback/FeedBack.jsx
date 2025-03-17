@@ -1,10 +1,13 @@
-export default function Feedback({ onClick, onReset, showReset }) {
+export default function Feedback({ feedback, totalFeedback }) {
+  const positivePercentage = Math.round((feedback.good / totalFeedback) * 100);
+
   return (
-    <div className="flex space-x-2">
-      <button onClick={() => onClick("good")}>Good</button>
-      <button onClick={() => onClick("neutral")}>Neutral</button>
-      <button onClick={() => onClick("bad")}>Bad</button>
-      {showReset && <button onClick={onReset}>Reset</button>}
+    <div>
+      <p>Good: {feedback.good}</p>
+      <p>Neutral: {feedback.neutral}</p>
+      <p>Bad: {feedback.bad}</p>
+      <p>Total Feedback: {totalFeedback}</p>
+      <p>Positive Feedback: {positivePercentage}%</p>
     </div>
   );
 }

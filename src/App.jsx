@@ -1,40 +1,51 @@
-import { useState } from "react";
-import Feedback from "./components/feedback/FeedBack";
-import Statistics from "./components/statistics/Statistics";
+import { useState, useEffect } from "react";
+import Description from "./components/description/Description";
+import Options from "./components/options/Options";
+import Feedback from "./components/feedback/Feedback";
+import Notification from "./components/notification/Notification";
 
 export default function App() {
-  const [good, setGood] = useState(0);
-  const [neutral, setNeutral] = useState(0);
-  const [bad, setBad] = useState(0);
-  const [total, setTotal] = useState(0);
-  const [showReset, setShowReset] = useState(false);
-
-  const handleClick = (type) => {
-    setShowReset(true);
-    if (type === "good") setGood(good + 1);
-    if (type === "neutral") setNeutral(neutral + 1);
-    if (type === "bad") setBad(bad + 1);
-    setTotal(total + 1);
+  const loadFeedbackFromStorage = () => {
+    const savedFeedback = JSON.parse(localStorage.getItem("feedback"));
+    return savedFeedback || { good: 0, neutral: 0, bad: 0 };
   };
 
-  const handleReset = () => {
-    setGood(0);
-    setNeutral(0);
-    setBad(0);
-    setTotal(0);
-    setShowReset(false);
+  const [feedback, setFeedback] = useState(loadFeedbackFromStorage);
+
+  useEffect(() => {
+    localStorage.setItem("feedback", JSON.stringify(feedback));
+  }, [feedback]);
+
+  const updateFeedback = (feedbackType) => {
+    setFeedback((prevFeedback) => ({
+      ...prevFeedback,
+      [feedbackType]: prevFeedback[feedbackType] + 1,
+    }));
   };
+
+  const resetFeedback = () => {
+    setFeedback({
+      good: 0,
+      neutral: 0,
+      bad: 0,
+    });
+  };
+
+  const totalFeedback = feedback.good + feedback.neutral + feedback.bad;
 
   return (
     <div>
-      <h1>Sip Happens Café</h1>
-      <p>Please leave your feedback about our service:</p>
-      <Feedback
-        onClick={handleClick}
-        onReset={handleReset}
-        showReset={showReset}
+      <Description />
+      <Options
+        updateFeedback={updateFeedback}
+        feedback={feedback}
+        resetFeedback={resetFeedback}
       />
-      <Statistics good={good} neutral={neutral} bad={bad} total={total} />
+      {totalFeedback > 0 ? (
+        <Feedback feedback={feedback} totalFeedback={totalFeedback} />
+      ) : (
+        <Notification />
+      )}
     </div>
   );
 }
